@@ -7,40 +7,40 @@
 #define __LPOMELO_H_
 
 struct lpomelo_event_recv_s {
-	int ev;
-	char* arg1;
-	char* arg2;
+    int ev;
+    char* arg1;
+    char* arg2;
 };
 typedef struct lpomelo_event_recv_s lpomelo_event_recv_t;
 
 struct lpomelo_request_recv_s {
-	int ret;
+    int ret;
     int rc;
     int rec;
-	char* resp;
+    char* resp;
 };
 typedef struct lpomelo_request_recv_s lpomelo_request_recv_t;
 
 struct lpomelo_notify_recv_s {
-	int ret;
+    int ret;
     int rc;
     int rec;
 };
 typedef struct lpomelo_notify_recv_s lpomelo_notify_recv_t;
 
 struct lpomelo_buffer_entity_s {
-	void* data;
-	struct lpomelo_buffer_entity_s* next;
+    void* data;
+    struct lpomelo_buffer_entity_s* next;
 };
 typedef struct lpomelo_buffer_entity_s lpomelo_buffer_entity_t;
 
 struct lpomelo_buffer_s {
-	int size;
-	int free;
+    int size;
+    int free;
     int flag;
     int hid;
-	lpomelo_buffer_entity_t* first;
-	lpomelo_buffer_entity_t* last;
+    lpomelo_buffer_entity_t* first;
+    lpomelo_buffer_entity_t* last;
 };
 typedef struct lpomelo_buffer_s lpomelo_buffer_t;
 

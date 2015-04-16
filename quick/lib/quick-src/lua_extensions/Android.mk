@@ -15,6 +15,10 @@ LOCAL_SRC_FILES += \
                         $(LOCAL_PATH)/cjson/lua_cjson.c \
                         $(LOCAL_PATH)/cjson/strbuf.c
 
+LOCAL_SRC_FILES += \
+                        $(LOCAL_PATH)/pomelo/lpomelo.c \
+                        $(LOCAL_PATH)/pomelo/lua_pomelo.c
+                        
 ifeq ($(CC_USE_SQLITE),1)
 LOCAL_SRC_FILES += \
                         $(LOCAL_PATH)/lsqlite3/sqlite3.c \
@@ -27,7 +31,8 @@ LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)/ \
                            $(LOCAL_PATH)/debugger \
                            $(LOCAL_PATH)/filesystem \
                            $(LOCAL_PATH)/lpack \
-                           $(LOCAL_PATH)/lsqlite3
+                           $(LOCAL_PATH)/lsqlite3 \
+                           $(LOCAL_PATH)/pomelo
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/ \
                     $(LOCAL_PATH)/cjson \
@@ -36,6 +41,7 @@ LOCAL_C_INCLUDES := $(LOCAL_PATH)/ \
                     $(LOCAL_PATH)/filesystem \
                     $(LOCAL_PATH)/lpack \
                     $(LOCAL_PATH)/lsqlite3 \
+                    $(LOCAL_PATH)/pomelo \
                     $(COCOS2DX_ROOT)/cocos \
                     $(COCOS2DX_ROOT)/external/lua/luajit/include
 

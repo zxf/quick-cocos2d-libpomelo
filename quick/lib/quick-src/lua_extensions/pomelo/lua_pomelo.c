@@ -9,10 +9,10 @@
 
 static int lib_init(lua_State* L) {
     lua_pushvalue(L, -3);
-	lua_pushvalue(L, -3);
-	lua_pushvalue(L, -3);
-	lpomelo_initlib(L);
-	return 0;
+    lua_pushvalue(L, -3);
+    lua_pushvalue(L, -3);
+    lpomelo_initlib(L);
+    return 0;
 }
 
 static int lib_cleanup(lua_State* L) {
@@ -36,26 +36,26 @@ static int state_to_str(lua_State* L) {
 }
 
 static int create(lua_State* L) {
-	lpomelo_client_t* client;
+    lpomelo_client_t* client;
     client = lpomelo_newclient(L);
-	if (!client) {
-		return 0;
-	}
-	lua_pushvalue(L, -4);
-	lua_pushvalue(L, -4);
-	lua_pushvalue(L, -4);
-	if(lpomelo_init(L, -4)){
+    if (!client) {
+        return 0;
+    }
+    lua_pushvalue(L, -4);
+    lua_pushvalue(L, -4);
+    lua_pushvalue(L, -4);
+    if(lpomelo_init(L, -4)){
         lua_pop(L, 1);
-		lpomelo_popclient(L);
-		return 0;
-	}
+        lpomelo_popclient(L);
+        return 0;
+    }
     return 1;
 }
 
 static int connect(lua_State* L) {
-	lua_pushvalue(L, -2);
-	lua_pushvalue(L, -2);
-	return lpomelo_connect(L, 1);
+    lua_pushvalue(L, -2);
+    lua_pushvalue(L, -2);
+    return lpomelo_connect(L, 1);
 }
 
 static int state(lua_State* L) {
@@ -65,7 +65,7 @@ static int state(lua_State* L) {
 static int sub(lua_State* L) {
     lua_pushvalue(L, -2);
     lua_pushvalue(L, -2);
-	return lpomelo_sub(L, 1);
+    return lpomelo_sub(L, 1);
 } 
 
 static int sub_close(lua_State* L) {
@@ -114,7 +114,7 @@ static int poll(lua_State* L) {
 }
 
 static int quality(lua_State* L) {
-	return lpomelo_poll(L, -1);
+    return lpomelo_poll(L, -1);
 }
 
 static int disconnect(lua_State* L) {
@@ -122,18 +122,18 @@ static int disconnect(lua_State* L) {
 }
 
 static int destroy(lua_State* L) {
-	return lpomelo_destroy(L, -1);
+    return lpomelo_destroy(L, -1);
 }
 
 static const luaL_reg pomelo_functions[] = {
     {"lib_init",    lib_init},
-	{"lib_cleanup", lib_cleanup},
-	{"ev_to_str", ev_to_str},
-	{"rc_to_str", rc_to_str},
-	{"state_to_str", state_to_str},
-	{"create", create},
-	{"connect", connect},
-	{"state", state},
+    {"lib_cleanup", lib_cleanup},
+    {"ev_to_str", ev_to_str},
+    {"rc_to_str", rc_to_str},
+    {"state_to_str", state_to_str},
+    {"create", create},
+    {"connect", connect},
+    {"state", state},
     {"sub", sub},
     {"sub_close", sub_close},
     {"sub_result", sub_result},
