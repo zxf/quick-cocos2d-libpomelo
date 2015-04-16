@@ -3,46 +3,46 @@ require("luapomelo")
 --[[
 --example
 local json = require("framework.json")
+local socket = require("socket")
 
 local storage = {
 }
 
-pomelo.lib_init(pomelo.PC_LOG_WARN, nil, nil)
+pomelo.lib_init(pomelo.PC_LOG_DEBUG, nil, nil)
 local client = pomelo.Client.new()
 
 client:init(true, false, function(op, data)
-if op == pomelo.PC_LOCAL_STORAGE_OP_WRITE then
-storage = json.decode(data)
-return 0
-else
-return json.encode(storage)
-end
+    if op == pomelo.PC_LOCAL_STORAGE_OP_WRITE then
+        storage = json.decode(data)
+        return 0
+    else
+        return json.encode(storage)
+    end
 end)
 
-local handler_id = client:add_ev_handler(function(ev, arg1, arg2)
-if ev == Client.PC_EV_USER_DEFINED_PUSH then
-print('get push message, route: ', arg1, 'msg: ', arg2)
-else
-print('network event:', pomelo.ev_to_str(ev), arg1, arg2)
-end
-end)
+client:connect('192.168.210.147', 3011)
+recv = client:sub()
+print(recv:result())
+socket.sleep(2)
+print(recv:result())
+recv:close()
 
+socket.sleep(1)
+resp = client:request('connector.entryHandler.entry', '{"name": "test"}', 10)
+socket.sleep(1)
+print(resp:result())
+resp:close()
 
-client:connect('127.0.0.1', 3011)
+resp = client:notify('test.testHandler.notify', '{"content": "test content"}', 10)
+socket.sleep(1)
+print(resp:result())
+resp:close()
 
-client:request('connector.entryHandler.entry', '{"name": "test"}', 10, function()
-print('request status: ', pomelo.rc_to_str(rc), 'resp:', resp)
-end);
-
-client:notify('test.testHandler.notify', '{"content": "test content"}', 10, function()
-print('notify status: ', pomelo.rc_to_str(rc))
-end)
-
-client:rm_ev_handler(handler_id)
+client:disconnect()
 
 client:destroy()
-
 pomelo.lib_cleanup()
+
 ]]
 if not pomelo then 
     pomelo = {
@@ -115,6 +115,53 @@ if not pomelo then
     pomelo.rc_to_str = luapomelo.rc_to_str
     pomelo.state_to_str = luapomelo.state_to_str
 
+    local EventResponse = class("EventResponse")
+
+    function EventResponse:ctor(client, event, buffer_size)
+        self._client = client
+        self._internal_data = luapomelo.sub(client._internal_data, event, buffer_size)
+    end
+
+    function EventResponse:close()
+        luapomelo.sub_close(self._client._internal_data, self._internal_data)
+        self._internal_data = nil
+        self._client = nil
+    end
+
+    function EventResponse:result()
+        return luapomelo.sub_result(self._internal_data)
+    end
+
+    local ResquestResponse = class("ResquestResponse")
+
+    function ResquestResponse:ctor(client, route, msg, timeout)
+        self._internal_data = luapomelo.request(client._internal_data, route, msg, timeout)
+    end
+
+    function ResquestResponse:close()
+        luapomelo.request_close(self._internal_data)
+        self._internal_data = nil
+    end
+
+    function ResquestResponse:result()
+        return luapomelo.request_result(self._internal_data)
+    end
+
+    local NotifyResponse = class("NotifyResponse")
+
+    function NotifyResponse:ctor(client, route, msg, timeout)
+        self._internal_data = luapomelo.request(client._internal_data, route, msg, timeout)
+    end
+
+    function NotifyResponse:close()
+        luapomelo.notify_close(self._internal_data)
+        self._internal_data = nil
+    end
+
+    function NotifyResponse:result()
+        return luapomelo.notify_result(self._internal_data)
+    end
+
     pomelo.Client = class("Client")
 
     function pomelo.Client:ctor()
@@ -149,33 +196,21 @@ if not pomelo then
         end
     end
 
-    function pomelo.Client:add_ev_handler(handler)
+    function pomelo.Client:sub(event, buffer_size)
+        return EventResponse.new(self, event, buffer_size)
+    end
+
+    function pomelo.Client:request(route, msg, timeout)
         if self._internal_data then
-            return luapomelo.add_ev_handler(self._internal_data, handler)
+            return ResquestResponse.new(self, route, msg, timeout)
         else
             return nil
         end
     end
 
-    function pomelo.Client:rm_ev_handler(handler_id)
+    function pomelo.Client:notify(route, msg, timeout)
         if self._internal_data then
-            return luapomelo.rm_ev_handler(self._internal_data, handler_id)
-        else
-            return nil
-        end
-    end
-
-    function pomelo.Client:request(route, msg, timeout, req_cb)
-        if self._internal_data then
-            return luapomelo.request(self._internal_data, route, msg, timeout, req_cb)
-        else
-            return nil
-        end
-    end
-
-    function pomelo.Client:notify(route, msg, timeout, notify_cb)
-        if self._internal_data then
-            return luapomelo.notify(self._internal_data, route, msg, timeout, notify_cb)
+            return NotifyResponse.new(self, route, msg, timeout)
         else
             return nil
         end
